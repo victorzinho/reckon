@@ -1,6 +1,6 @@
 [project]
 name = "reckon"
-version = "0.1.0rc1"
+version = "0.1.0rc2"
 description = "Specs and their audits, for spec-driven development"
 readme = "README.md"
 license = "MIT"
