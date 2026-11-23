@@ -1,0 +1,3 @@
+auditor: auditor-a
+assessments:
+  - {ac_id: AC-1, verdict: OK}

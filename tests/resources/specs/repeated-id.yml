@@ -1,0 +1,11 @@
+criteria:
+  - id: AC-1
+    verify: review
+    obligation: must
+    subject: s
+    rule: r
+  - id: AC-1
+    verify: review
+    obligation: may
+    subject: s
+    rule: r

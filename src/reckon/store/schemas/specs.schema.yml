@@ -1,0 +1,167 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: specs.schema.yml
+title: Reckon spec
+description: >-
+  What must hold, for a task or for a whole app. Each criterion is proven by an automated test
+  (`verify: test`) or judged by a reviewer (`verify: review`).
+type: object
+required:
+  - criteria
+additionalProperties: false
+properties:
+  criteria:
+    type: array
+    minItems: 1
+    items:
+      $ref: '#/$defs/criterion'
+$defs:
+  text:
+    type: string
+    pattern: \S
+  criterion:
+    type: object
+    required:
+      - verify
+    properties:
+      verify:
+        enum:
+          - test
+          - review
+    allOf:
+      - if:
+          properties:
+            verify:
+              const: test
+        then:
+          $ref: '#/$defs/testCriterion'
+      - if:
+          properties:
+            verify:
+              const: review
+        then:
+          $ref: '#/$defs/reviewCriterion'
+  testCriterion:
+    description: >-
+      With `verify: test`, behaviour proven by automated tests, on one surface. `when` is always on the criterion.
+      `given` and `then` are each written once: on the criterion when every case shares it, or in
+      every case when it differs between them. Without `cases`, both are on the criterion.
+    type: object
+    required:
+      - id
+      - verify
+      - description
+      - when
+    additionalProperties: false
+    properties:
+      id:
+        $ref: '#/$defs/text'
+      verify:
+        const: test
+      description:
+        description: The behaviour this criterion pins down, readable on its own.
+        $ref: '#/$defs/text'
+      when:
+        description: The single surface every case exercises.
+        $ref: '#/$defs/text'
+      given:
+        description: >-
+          Fixture state shared by every case. Omit when the setup varies;
+          then every case states it.
+        $ref: '#/$defs/text'
+      then:
+        description: >-
+          The observable outcome shared by every case. Omit when the outcome varies;
+          then every case states it.
+        $ref: '#/$defs/text'
+      cases:
+        description: Closed enumeration of what varies.
+        type: array
+        minItems: 1
+        maxItems: 26
+        items:
+          $ref: '#/$defs/case'
+    allOf:
+      - if:
+          not:
+            required:
+              - cases
+        then:
+          required:
+            - given
+            - then
+      - if:
+          required:
+            - given
+        then:
+          properties:
+            cases:
+              items:
+                not:
+                  required:
+                    - given
+        else:
+          properties:
+            cases:
+              items:
+                required:
+                  - given
+      - if:
+          required:
+            - then
+        then:
+          properties:
+            cases:
+              items:
+                not:
+                  required:
+                    - then
+        else:
+          properties:
+            cases:
+              items:
+                required:
+                  - then
+  case:
+    description: One case, carrying only what the criterion does not already state.
+    type: object
+    minProperties: 1
+    additionalProperties: false
+    properties:
+      given:
+        description: Distinguishing fixture state. Present only when the criterion omits `given`.
+        $ref: '#/$defs/text'
+      then:
+        description: The observable outcome this case produces. Present only when the criterion omits `then`.
+        $ref: '#/$defs/text'
+  reviewCriterion:
+    description: "With `verify: review`, a property judged by a reviewer."
+    type: object
+    required:
+      - id
+      - verify
+      - obligation
+      - subject
+      - rule
+    additionalProperties: false
+    properties:
+      id:
+        $ref: '#/$defs/text'
+      verify:
+        const: review
+      obligation:
+        enum:
+          - must
+          - should
+          - may
+      subject:
+        description: Artifact population the reviewer inspects, plus any scope the rule depends on.
+        $ref: '#/$defs/text'
+      rule:
+        description: The rule to review.
+        $ref: '#/$defs/text'
+      exception:
+        description: Documented valid deviation, normally should-only.
+        $ref: '#/$defs/text'
+      rationale:
+        description: Why the rule exists.
+        $ref: '#/$defs/text'

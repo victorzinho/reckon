@@ -1,0 +1,91 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: audit.schema.yml
+title: Reckon audit
+description: >-
+  One auditor's judgment of a spec. An **audited unit** is one case of a test criterion
+  (addressed by letter, AC-1a) or one review criterion (addressed by its id);
+  a test criterion holding a single case is audited under its own bare id or its case (AC-1 or AC-1a).
+type: object
+required:
+  - auditor
+additionalProperties: false
+if:
+  properties:
+    assessments:
+      maxItems: 0
+then:
+  required:
+    - missed_requirements
+properties:
+  auditor:
+    $ref: '#/$defs/text'
+  assessments:
+    description: >-
+      Exactly one entry per audited unit of the spec this file is named after
+      (cli.reckon.audit.opus.yml audits cli.reckon.yml) — one per case, one per
+      review criterion — ids unique and complete. Empty or absent when the audit has only missed requirements.
+    type: array
+    items:
+      $ref: '#/$defs/assessment'
+  missed_requirements:
+    description: >-
+      Obligations the spec is silent on.
+    type: array
+    minItems: 1
+    items:
+      $ref: '#/$defs/missedRequirement'
+$defs:
+  text:
+    type: string
+    pattern: \S
+  verdict:
+    description: >-
+      OK when the unit determines one implementation and breaks no standing rule.
+      UNCONSTITUTIONAL when it conflicts with a standing rule — name that rule in `rule`.
+      AMBIGUOUS when two implementers reading this spec would build different things.
+    enum:
+      - OK
+      - UNCONSTITUTIONAL
+      - AMBIGUOUS
+  assessment:
+    type: object
+    required:
+      - ac_id
+      - verdict
+    additionalProperties: false
+    properties:
+      ac_id:
+        description: Audited-unit id — a case such as AC-1b, or a review criterion id.
+        $ref: '#/$defs/text'
+      verdict:
+        $ref: '#/$defs/verdict'
+      rule:
+        description: Conflicting standing-rule id. REQUIRED for UNCONSTITUTIONAL, forbidden otherwise.
+        $ref: '#/$defs/text'
+      note:
+        description: The wording that decided the verdict. Omit when the verdict is OK.
+        $ref: '#/$defs/text'
+    if:
+      properties:
+        verdict:
+          const: UNCONSTITUTIONAL
+    then:
+      required:
+        - rule
+    else:
+      not:
+        required:
+          - rule
+  missedRequirement:
+    description: A source requirement no criterion speaks to.
+    type: object
+    required:
+      - requirement
+    additionalProperties: false
+    properties:
+      requirement:
+        description: The uncovered obligation, quoted or paraphrased from the source requirements.
+        $ref: '#/$defs/text'
+      note:
+        description: Why the spec is silent on it.
+        $ref: '#/$defs/text'

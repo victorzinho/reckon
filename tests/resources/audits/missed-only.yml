@@ -1,0 +1,4 @@
+auditor: gpt-5.5
+missed_requirements:
+  - requirement: unauthenticated requests return 401
+    note: no criterion exercises the endpoint without credentials

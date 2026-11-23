@@ -1,0 +1,8 @@
+criteria:
+  - id: AC-1
+    verify: test
+    description: an unknown widget id is rejected before any write
+    when: POST /widgets
+    given: a body naming a widget id that does not exist
+    cases:
+      - then: the response is 404 and no row is written

@@ -1,0 +1,16 @@
+auditor: auditor-a
+assessments:
+  - {ac_id: AC-1a, verdict: OK}
+  - {ac_id: AC-1b, verdict: OK}
+  - {ac_id: AC-2a, verdict: OK}
+  - {ac_id: AC-2b, verdict: OK}
+  - {ac_id: AC-2c, verdict: OK}
+  - {ac_id: AC-3a, verdict: OK}
+  - {ac_id: AC-3b, verdict: OK}
+  - ac_id: AC-4
+    verdict: AMBIGUOUS
+    note: '"no row is written" names no table'
+  - ac_id: AC-6
+    verdict: UNCONSTITUTIONAL
+    rule: PY-layers
+    note: the exception contradicts PY-layers

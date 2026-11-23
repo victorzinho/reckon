@@ -1,0 +1,18 @@
+name: Release
+run-name: Release ${{ inputs.release_type }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        type: choice
+        options: [rc, stable]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: victorzinho/bosun/.github/workflows/python-uv-release.yml@v0.1.0rc3
+    with:
+      release_type: ${{ inputs.release_type }}

@@ -1,0 +1,11 @@
+name: CI
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: victorzinho/bosun/.github/workflows/python-uv-ci.yml@v0.1.0rc3

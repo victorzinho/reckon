@@ -1,0 +1,9 @@
+criteria:
+  - id: AC-1
+    verify: test
+    description: d
+    when: w
+    given: shared fixture
+    cases:
+      - given: case fixture
+        then: outcome

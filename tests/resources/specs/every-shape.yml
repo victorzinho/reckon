@@ -1,0 +1,40 @@
+criteria:
+  - id: AC-1
+    verify: test
+    description: a widget's status is derived from the states of its jobs
+    when: GET /widgets/{id}
+    cases:
+      - given: a widget whose jobs are all COMPLETED
+        then: widget.status == "READY"
+      - given: a widget with one FAILED job and one PENDING job
+        then: widget.status == "PROCESSING"
+  - id: AC-2
+    verify: test
+    description: re-enqueueing a widget resets its queue row in place rather than replacing it
+    when: the widget is re-enqueued
+    given: an existing terminal or PENDING queue row for a widget
+    cases:
+      - then: the row uuid is preserved
+      - then: status == PENDING
+      - then: attempts == 0
+  - id: AC-3
+    verify: test
+    description: a FAILED job never wins over a non-terminal sibling
+    when: GET /widgets/{id}
+    then: widget.status == "PROCESSING"
+    cases:
+      - given: one FAILED job and one PENDING job
+      - given: one FAILED job and one PROCESSING job
+  - id: AC-4
+    verify: test
+    description: an unknown widget id is rejected before any write
+    when: POST /widgets
+    given: a body naming a widget id that does not exist
+    then: the response is 404 and no row is written
+  - id: AC-6
+    verify: review
+    obligation: should
+    subject: every repository module
+    rule: reference only repository-layer and ORM/framework code, never services, routers, or API schemas
+    exception: a module may import a shared enum from the API schemas
+    rationale: the repository is the persistence boundary; upward dependencies leak abstractions
